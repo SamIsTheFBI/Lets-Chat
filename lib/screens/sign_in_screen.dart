@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'home_screen.dart';
 import '../services/matrix_auth_service.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -31,6 +33,19 @@ class _SignInScreenState extends State<SignInScreen> {
 
     if (response != null && response.containsKey('access_token')) {
       print('Login successful: ${response['access_token']}');
+      final accessToken = response['access_token'];
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('access_token', accessToken);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(
+            homeserverUrl: homeserverUrl,
+            accessToken: accessToken,
+          ),
+        ),
+      );
     } else {
       setState(() {
         errorMessage = "Login failed. Please check your credentials.";
