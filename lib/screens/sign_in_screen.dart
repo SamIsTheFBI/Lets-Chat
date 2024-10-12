@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/matrix_auth_service.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -25,7 +26,16 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    print('Signing in with: $homeserverUrl, $username, $password');
+    MatrixAuthService authService = MatrixAuthService(homeserverUrl);
+    final response = await authService.login(username, password);
+
+    if (response != null && response.containsKey('access_token')) {
+      print('Login successful: ${response['access_token']}');
+    } else {
+      setState(() {
+        errorMessage = "Login failed. Please check your credentials.";
+      });
+    }
   }
 
   @override
