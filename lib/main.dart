@@ -12,7 +12,7 @@ class MatrixClientApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Matrix Client App',
+      title: 'Ciphera App',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const SignInScreen(),
     );

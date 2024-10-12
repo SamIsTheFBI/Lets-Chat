@@ -56,7 +56,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Matrix Client - Sign In')),
+      appBar: AppBar(title: const Text('Ciphera - Sign In')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
