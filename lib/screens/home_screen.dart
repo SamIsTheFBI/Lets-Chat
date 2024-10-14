@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matrix_client_app/screens/room_creation_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/matrix_room_service.dart';
 import 'sign_in_screen.dart';
@@ -75,6 +76,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _navigateToRoomCreation() async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => RoomCreationScreen(
+                accessToken: widget.accessToken,
+                homeserverUrl: widget.homeserverUrl)));
+    if (result == true) {
+      _refreshRoomList();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,8 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _createRoom,
+        onPressed: _navigateToRoomCreation,
         tooltip: 'Create Room',
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
       body: Column(
@@ -124,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           );
+                          _refreshRoomList();
                         },
                       );
                     },
