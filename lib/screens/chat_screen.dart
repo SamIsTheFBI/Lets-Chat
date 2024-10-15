@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:matrix_client_app/models/message_model.dart';
+import 'package:matrix_client_app/widgets/message_bubble.dart';
 import '../services/matrix_message_service.dart';
 import '../services/matrix_room_service.dart'; // Import room service
 
@@ -29,6 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Map<String, dynamic>> messages = [];
   String roomName = 'Loading...'; // Initial value
   String? roomAvatar; // Null if not available
+  MessageModel? _messageToReply;
 
   @override
   void initState() {
@@ -69,10 +70,18 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _sendMessage() async {
     final messageText = _messageController.text.trim();
     if (messageText.isNotEmpty) {
-      await messageService.sendMessage(widget.roomId, messageText);
+      await messageService.sendMessage(widget.roomId, messageText,
+          replyTo: _messageToReply?.messageBody);
       _messageController.clear();
+      _messageToReply = null;
       _loadMessages(); // Reload messages after sending a new one
     }
+  }
+
+  void _handleReply(MessageModel message) {
+    setState(() {
+      _messageToReply = message;
+    });
   }
 
   String getEventDisplayText(Map<String, dynamic> event) {
@@ -136,8 +145,36 @@ class _ChatScreenState extends State<ChatScreen> {
         }
 
       default:
-        return event.toString();
+        return '[unknown event]';
     }
+  }
+
+  Future<void> getCurrentUser() async => await messageService.getCurrentUser();
+
+  Widget _buildMessageItem(MessageModel message, bool isCurrentUser) {
+    return Container(
+      alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Text(message.messageBody),
+    );
+  }
+
+  Widget _buildUserInput() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _messageController,
+            decoration: const InputDecoration(
+              hintText: 'Enter your message',
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.send),
+          onPressed: _sendMessage,
+        ),
+      ],
+    );
   }
 
   @override
@@ -185,22 +222,38 @@ class _ChatScreenState extends State<ChatScreen> {
                       final messageSender =
                           message['sender'] ?? 'Unknown Sender';
 
+                      final currentUser = getCurrentUser();
+                      bool isCurrentUser = messageSender == currentUser;
+
                       if (message['type'] == 'm.room.message') {
-                        return ListTile(
-                          title: Text(
-                            messageBody,
-                            style: TextStyle(
-                              fontSize:
-                                  message['type'] != 'm.room.message' ? 10 : 18,
-                            ),
-                          ), // Ensure this won't be null
-                          subtitle: Text(
-                            messageSender,
-                            style: const TextStyle(
-                              fontSize: 10,
-                            ),
-                          ), // Ensure this won't be null
-                        );
+                        final MessageModel modelMessage = MessageModel(
+                            eventId: message['event_id'],
+                            messageBody: messageBody,
+                            sender: messageSender,
+                            timestamp: message['origin_server_ts']);
+                        return _buildMessageItem(modelMessage, isCurrentUser);
+
+                        // return MessageBubble(
+                        //   message: modelMessage,
+                        //   onReply: _handleReply,
+                        //   isCurrentUser: isCurrentUser,
+                        // );
+
+                        // ListTile(
+                        //   title: Text(
+                        //     messageBody,
+                        //     style: TextStyle(
+                        //       fontSize:
+                        //           message['type'] != 'm.room.message' ? 10 : 18,
+                        //     ),
+                        //   ), // Ensure this won't be null
+                        //   subtitle: Text(
+                        //     messageSender,
+                        //     style: const TextStyle(
+                        //       fontSize: 10,
+                        //     ),
+                        //   ), // Ensure this won't be null
+                        // );
                       } else {
                         return ListTile(
                           visualDensity: const VisualDensity(
@@ -220,24 +273,11 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
+
+          // user input
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter your message',
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _sendMessage,
-                ),
-              ],
-            ),
+            child: _buildUserInput(),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/matrix_room_service.dart';
 import 'sign_in_screen.dart';
 import 'chat_screen.dart';
+import 'room_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String homeserverUrl;
@@ -14,6 +15,37 @@ class HomeScreen extends StatefulWidget {
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
+}
+
+class RoomSearchDelegate extends SearchDelegate {
+  final MatrixRoomService matrixRoomService;
+
+  RoomSearchDelegate({required this.matrixRoomService});
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(onPressed: () => query = '', icon: const Icon(Icons.clear))
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      onPressed: () => close(context, null),
+      icon: const Icon(Icons.arrow_back),
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return RoomListScreen(matrixRoomService: matrixRoomService, query: query);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Container();
+  }
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -94,7 +126,16 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Ciphera - Rooms'),
         actions: [
-          IconButton(onPressed: () => {}, icon: const Icon(Icons.search)),
+          IconButton(
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: RoomSearchDelegate(matrixRoomService: roomService),
+              );
+              _refreshRoomList();
+            },
+            icon: const Icon(Icons.search),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _logout,

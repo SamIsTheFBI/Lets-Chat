@@ -45,8 +45,28 @@ class MatrixMessageService {
     }
   }
 
+  Future<String?> getCurrentUser() async {
+    final url = Uri.parse('$homeserverUrl/_matrix/client/r0/account/whoami');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['user_id']; // This is the Matrix ID of the user
+    } else {
+      print('Failed to get current user: ${response.statusCode}');
+      return null;
+    }
+  }
+
   // Send a new message to the room
-  Future<void> sendMessage(String roomId, String message) async {
+  Future<void> sendMessage(String roomId, String message,
+      {String? replyTo}) async {
     final txnId = DateTime.now()
         .millisecondsSinceEpoch
         .toString(); // Unique transaction ID
@@ -61,6 +81,10 @@ class MatrixMessageService {
       body: jsonEncode({
         'msgtype': 'm.text',
         'body': message,
+        if (replyTo != null)
+          "m.relates_to": {
+            "m.in_reply_to": {"event_id": replyTo}
+          }
       }),
     );
 

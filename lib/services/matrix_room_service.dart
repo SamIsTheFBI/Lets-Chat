@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:matrix_client_app/models/room_model.dart';
 
 class MatrixRoomService {
   final String homeserverUrl;
@@ -100,6 +101,36 @@ class MatrixRoomService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to create room');
+    }
+  }
+
+  Future<List<RoomModel>> searchPublicRooms(String query) async {
+    final url = Uri.parse(
+        '$homeserverUrl/_matrix/client/r0/publicRooms?limit=10&filter={"generic_search_term":"$query"}');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      List rooms = data['chunk'];
+      return rooms.map((room) => RoomModel.fromJson(room)).toList();
+    } else {
+      throw Exception('Failed to search rooms: ${response.statusCode}');
+    }
+  }
+
+  // Join a room by roomId
+  Future<void> joinRoom(String roomId) async {
+    final url = Uri.parse('$homeserverUrl/_matrix/client/r0/join/$roomId');
+    final response = await http.post(
+      url,
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to join room: ${response.statusCode}');
     }
   }
 }
