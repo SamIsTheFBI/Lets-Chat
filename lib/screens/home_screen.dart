@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrix_client_app/screens/room_creation_screen.dart';
 import 'package:matrix_client_app/screens/welcome_screen.dart';
+import 'package:matrix_client_app/widgets/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/matrix_room_service.dart';
 import 'sign_in_screen.dart';
@@ -137,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ciphera - Rooms'),
+        title: const Text('Home'),
         actions: [
           IconButton(
             onPressed: () {
@@ -162,6 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
+      drawer: const HomeDrawer(),
       body: Column(
         children: [
           Expanded(
