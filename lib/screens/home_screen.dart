@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:matrix_client_app/screens/room_creation_screen.dart';
+import 'package:matrix_client_app/screens/welcome_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/matrix_room_service.dart';
 import 'sign_in_screen.dart';
@@ -69,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Create a new room
   Future<void> _createRoom() async {
     final roomNameController = TextEditingController();
+    final roomSearchController = TextEditingController();
 
     await showDialog(
       context: context,
@@ -104,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.remove('access_token');
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const SignInScreen()),
+      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
     );
   }
 
@@ -115,6 +117,17 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (context) => RoomCreationScreen(
                 accessToken: widget.accessToken,
                 homeserverUrl: widget.homeserverUrl)));
+    if (result == true) {
+      _refreshRoomList();
+    }
+  }
+
+  Future<void> _navigateToRoomSearch() async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                RoomListScreen(matrixRoomService: roomService, query: '')));
     if (result == true) {
       _refreshRoomList();
     }

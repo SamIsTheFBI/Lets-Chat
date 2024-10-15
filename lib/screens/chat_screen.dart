@@ -154,7 +154,13 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildMessageItem(MessageModel message, bool isCurrentUser) {
     return Container(
       alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Text(message.messageBody),
+      child: Column(
+        crossAxisAlignment:
+            isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(message.messageBody),
+        ],
+      ),
     );
   }
 
@@ -255,10 +261,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         //   ), // Ensure this won't be null
                         // );
                       } else {
-                        return ListTile(
-                          visualDensity: const VisualDensity(
-                              horizontal: 0, vertical: -4.0),
-                          title: Text(
+                        return Container(
+                          padding: const EdgeInsets.all(10),
+                          child: Text(
                             messageBody,
                             style: const TextStyle(
                               fontSize: 10,

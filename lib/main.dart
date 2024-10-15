@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:matrix_client_app/themes/light_mode.dart';
 import 'screens/welcome_screen.dart';
 
 void main() {
@@ -14,11 +15,7 @@ class MatrixClientApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Ciphera App',
-      theme: ThemeData(
-        textTheme: GoogleFonts.interTightTextTheme(Theme.of(context).textTheme),
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: lightMode,
       home: const WelcomeScreen(),
     );
   }

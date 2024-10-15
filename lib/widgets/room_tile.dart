@@ -16,7 +16,15 @@ class RoomTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(room.name),
-      subtitle: Text(room.numJoinedMembers.toString()),
+      subtitle: Row(
+        children: [
+          const Icon(Icons.person),
+          const SizedBox(
+            width: 10,
+          ),
+          Text(room.numJoinedMembers.toString()),
+        ],
+      ),
       trailing: ElevatedButton(
         onPressed: () async {
           try {
@@ -30,6 +38,8 @@ class RoomTile extends StatelessWidget {
             );
           }
         },
+        style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue, foregroundColor: Colors.white),
         child: const Text('Join'),
       ),
     );
