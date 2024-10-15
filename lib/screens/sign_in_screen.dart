@@ -72,6 +72,8 @@ class _SignInScreenState extends State<SignInScreen> {
               TextField(
                 controller: _homeserverController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceContainer,
                   hintText: 'Homeserver URL',
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
@@ -89,6 +91,8 @@ class _SignInScreenState extends State<SignInScreen> {
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceContainer,
                   hintText: 'Username',
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
@@ -106,6 +110,8 @@ class _SignInScreenState extends State<SignInScreen> {
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceContainer,
                   hintText: 'Password',
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(

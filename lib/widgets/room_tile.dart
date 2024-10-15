@@ -15,6 +15,7 @@ class RoomTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      tileColor: Theme.of(context).colorScheme.tertiary,
       title: Text(room.name),
       subtitle: Row(
         children: [
