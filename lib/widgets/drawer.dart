@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrix_client_app/main.dart';
 import 'package:matrix_client_app/screens/settings_screen.dart';
+import 'package:matrix_client_app/screens/welcome_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeDrawer extends StatelessWidget {
@@ -66,7 +67,15 @@ class HomeDrawer extends StatelessWidget {
                 child: ListTile(
                   title: const Text("Sign Out"),
                   leading: const Icon(Icons.logout),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context, true);
+                    print('pahuncha');
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const WelcomeScreen()),
+                    );
+                  },
                 ),
               ),
             ],

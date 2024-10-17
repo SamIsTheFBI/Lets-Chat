@@ -28,7 +28,7 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    MatrixAuthService authService = MatrixAuthService();
+    MatrixAuthService authService = MatrixAuthService(homeserverUrl);
     final response = await authService.login(username, password);
 
     if (response != null && response.containsKey('access_token')) {

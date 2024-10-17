@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:matrix_client_app/screens/home_screen.dart';
 import 'package:matrix_client_app/screens/sign_in_screen.dart';
+import 'package:matrix_client_app/screens/splash_screen.dart';
 import 'package:matrix_client_app/services/matrix_auth_service.dart';
 import 'package:matrix_client_app/themes/light_mode.dart';
 import 'package:matrix_client_app/utils/storage_util.dart';
@@ -20,29 +21,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final MatrixAuthService _authService = MatrixAuthService();
-  Widget _initialScreen = const CircularProgressIndicator();
+  final Widget _initialScreen = const CircularProgressIndicator();
 
   @override
   void initState() {
     super.initState();
-    _checkAuthStatus();
-  }
-
-  Future<void> _checkAuthStatus() async {
-    // Check if the user is authenticated with a stored access token and homeserver
-    bool isAuthenticated = await _authService.isAuthenticated();
-    String? homeserverUrl = await StorageUtil.getHomeserver();
-    String? accessToken = await StorageUtil.getAccessToken();
-
-    setState(() {
-      if (isAuthenticated && homeserverUrl is String && accessToken is String) {
-        _initialScreen =
-            HomeScreen(homeserverUrl: homeserverUrl, accessToken: accessToken);
-      } else {
-        _initialScreen = const WelcomeScreen();
-      }
-    });
+    // _checkAuthStatus();
   }
 
   @override
@@ -51,11 +35,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Ciphera App',
       theme: lightMode,
-      home: Scaffold(
-        body: Center(
-          child: _initialScreen,
-        ),
-      ),
+      home: const SplashScreen(),
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
       },

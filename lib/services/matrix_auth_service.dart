@@ -8,29 +8,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MatrixAuthService {
   final String homeserverUrl;
 
-  MatrixAuthService({this.homeserverUrl = 'http://10.0.2.2:8008'});
+  MatrixAuthService(this.homeserverUrl);
 
   Future<Map<String, dynamic>?> login(String username, String password) async {
     String stringUrl = '$homeserverUrl/_matrix/client/r0/login';
     final url = Uri.parse(stringUrl);
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'type': 'm.login.password',
-        'user': username,
-        'password': password,
-      }),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'type': 'm.login.password',
+          'user': username,
+          'password': password,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final accessToken = data['access_token'];
-      await StorageUtil.saveAccessToken(accessToken);
-      return jsonDecode(response.body);
-    } else {
+      if (response.statusCode == 200) {
+        print('pahunch gya');
+        final data = jsonDecode(response.body);
+        final accessToken = data['access_token'];
+        await StorageUtil.saveAccessToken(accessToken);
+        return jsonDecode(response.body);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
       return null;
     }
   }
@@ -47,7 +53,6 @@ class MatrixAuthService {
       url,
       headers: {'Authorization': 'Bearer $accessToken'},
     );
-    print(response.statusCode == 200);
     return response.statusCode == 200;
   }
 
