@@ -29,7 +29,9 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Map<String, dynamic>> messages = [];
   String roomName = 'Loading...'; // Initial value
   String? roomAvatar; // Null if not available
+  String memberCount = 'Loading member count...';
   MessageModel? _messageToReply;
+  String currentUser = '';
 
   @override
   void initState() {
@@ -38,7 +40,15 @@ class _ChatScreenState extends State<ChatScreen> {
         MatrixMessageService(widget.homeserverUrl, widget.accessToken);
     roomService = MatrixRoomService(widget.homeserverUrl, widget.accessToken);
     _loadMessages();
+    _getCurrentUser();
     _fetchRoomDetails();
+  }
+
+  void _getCurrentUser() async {
+    final res = await messageService.getCurrentUser();
+    if (res is String) {
+      currentUser = res;
+    }
   }
 
   // Load room messages
@@ -59,7 +69,8 @@ class _ChatScreenState extends State<ChatScreen> {
       final details = await roomService.getRoomDetails(widget.roomId);
       setState(() {
         roomName = details['name'];
-        roomAvatar = details['avatar']; // Avatar may be null
+        roomAvatar = details['avatar'];
+        memberCount = details['num_joined_members'];
       });
     } catch (error) {
       print('Error loading room details: $error');
@@ -145,11 +156,10 @@ class _ChatScreenState extends State<ChatScreen> {
         }
 
       default:
-        return '[unknown event]';
+        return event.toString();
+      // return '[unknown event]';
     }
   }
-
-  Future<void> getCurrentUser() async => await messageService.getCurrentUser();
 
   Widget _buildMessageItem(MessageModel message, bool isCurrentUser) {
     return Container(
@@ -158,7 +168,45 @@ class _ChatScreenState extends State<ChatScreen> {
         crossAxisAlignment:
             isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          Text(message.messageBody),
+          Visibility(
+            visible: !isCurrentUser,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Text(
+                isCurrentUser ? '' : message.sender,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            decoration: BoxDecoration(
+              borderRadius: isCurrentUser
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                      bottomLeft: Radius.circular(30))
+                  : const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                      bottomRight: Radius.circular(30)),
+              color: isCurrentUser
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.secondary,
+            ),
+            child: Text(
+              message.messageBody,
+              style: TextStyle(
+                color: isCurrentUser
+                    ? Theme.of(context).colorScheme.inversePrimary
+                    : Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -170,14 +218,36 @@ class _ChatScreenState extends State<ChatScreen> {
         Expanded(
           child: TextField(
             controller: _messageController,
-            decoration: const InputDecoration(
-              hintText: 'Enter your message',
-            ),
+            decoration: InputDecoration(
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surfaceContainer,
+                hintText: 'Enter your message',
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.tertiary,
+                )),
           ),
         ),
-        IconButton(
-          icon: const Icon(Icons.send),
-          onPressed: _sendMessage,
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            shape: BoxShape.circle,
+          ),
+          margin: const EdgeInsets.only(right: 7, left: 13),
+          child: IconButton(
+            icon: const Icon(Icons.north_east),
+            onPressed: _sendMessage,
+            color: Theme.of(context).colorScheme.inversePrimary,
+          ),
         ),
       ],
     );
@@ -187,21 +257,23 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Row(
           children: [
-            // Room Avatar
-            roomAvatar != null
-                ? CircleAvatar(
-                    backgroundImage:
-                        NetworkImage('${widget.homeserverUrl}$roomAvatar'),
-                  )
-                : const CircleAvatar(
-                    backgroundColor: Colors.grey, // Default grey circle
-                    child: Icon(Icons.person),
-                  ),
-            const SizedBox(width: 10), // Space between avatar and name
             // Room Name
-            Text(roomName),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(roomName),
+                // Text(
+                //   memberCount,
+                //   style: TextStyle(
+                //     color: Theme.of(context).colorScheme.secondary,
+                //   ),
+                // ),
+              ],
+            ),
           ],
         ),
       ),
@@ -228,7 +300,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       final messageSender =
                           message['sender'] ?? 'Unknown Sender';
 
-                      final currentUser = getCurrentUser();
                       bool isCurrentUser = messageSender == currentUser;
 
                       if (message['type'] == 'm.room.message') {
@@ -237,6 +308,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             messageBody: messageBody,
                             sender: messageSender,
                             timestamp: message['origin_server_ts']);
+
                         return _buildMessageItem(modelMessage, isCurrentUser);
 
                         // return MessageBubble(
@@ -261,13 +333,15 @@ class _ChatScreenState extends State<ChatScreen> {
                         //   ), // Ensure this won't be null
                         // );
                       } else {
-                        return Container(
-                          padding: const EdgeInsets.all(10),
-                          child: Text(
-                            messageBody,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey,
+                        return Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: Text(
+                              messageBody,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                         );

@@ -55,8 +55,10 @@ class MatrixMessageService {
       },
     );
 
+    print('pahuncha');
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(data['user_id']);
       return data['user_id']; // This is the Matrix ID of the user
     } else {
       print('Failed to get current user: ${response.statusCode}');

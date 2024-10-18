@@ -32,7 +32,8 @@ class MatrixRoomService {
 
       return {
         'name': responseBody['name'] ?? 'Unnamed Room',
-        'avatar': avatarBody?['url'], // Avatar might not exist
+        'avatar': avatarBody?['url'],
+        'num_joined_members': responseBody['num_joined_members'].toString(),
       };
     } else {
       throw Exception('Failed to fetch room details');
