@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:matrix_client_app/screens/home_screen.dart';
-import 'package:matrix_client_app/screens/sign_in_screen.dart';
 import 'package:matrix_client_app/screens/splash_screen.dart';
-import 'package:matrix_client_app/services/matrix_auth_service.dart';
 import 'package:matrix_client_app/themes/light_mode.dart';
-import 'package:matrix_client_app/utils/storage_util.dart';
+import 'package:matrix_client_app/themes/theme_provider.dart';
 import 'screens/welcome_screen.dart';
+import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(ChangeNotifierProvider(
+    create: (context) => ThemeProvider(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -21,8 +22,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final Widget _initialScreen = const CircularProgressIndicator();
-
   @override
   void initState() {
     super.initState();
@@ -34,7 +33,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Ciphera App',
-      theme: lightMode,
+      theme: Provider.of<ThemeProvider>(context).themeData,
       home: const SplashScreen(),
       routes: {
         '/welcome': (context) => const WelcomeScreen(),

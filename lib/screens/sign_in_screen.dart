@@ -71,6 +71,9 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 50),
               TextField(
                 controller: _homeserverController,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Theme.of(context).colorScheme.surfaceContainer,
@@ -90,6 +93,9 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 10),
               TextField(
                 controller: _usernameController,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Theme.of(context).colorScheme.surfaceContainer,
@@ -109,6 +115,9 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 10),
               TextField(
                 controller: _passwordController,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Theme.of(context).colorScheme.surfaceContainer,

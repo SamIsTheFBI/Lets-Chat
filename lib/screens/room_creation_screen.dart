@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -89,18 +90,31 @@ class _RoomCreationScreenState extends State<RoomCreationScreen> {
             const SizedBox(height: 20),
 
             // Switch for Encryption
-            SwitchListTile(
-              title: const Text('Enable End-to-End Encryption'),
-              value: _isEncrypted,
-              onChanged: (bool value) {
-                setState(() {
-                  _isEncrypted = value;
-                });
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Enable End-to-End Encryption'),
+                CupertinoSwitch(
+                  // title: const Text('Enable End-to-End Encryption'),
+                  value: _isEncrypted,
+                  activeColor: Theme.of(context).colorScheme.primary,
+                  onChanged: (bool value) {
+                    setState(() {
+                      _isEncrypted = value;
+                    });
+                  },
+                ),
+              ],
             ),
 
             const SizedBox(height: 20),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  )),
               onPressed: createRoom,
               child: const Text('Create Room'),
             ),

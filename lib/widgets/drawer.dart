@@ -27,11 +27,12 @@ class HomeDrawer extends StatelessWidget {
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
-                    const Text(
+                    Text(
                       'Ciphera',
                       style: TextStyle(
                         fontSize: 27,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -80,9 +81,12 @@ class HomeDrawer extends StatelessWidget {
               ),
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 15.0),
-            child: Text('Built by Team Bad Apple'),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 15.0),
+            child: Text(
+              'Built by Team Bad Apple',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
           )
         ],
       ),

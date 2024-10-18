@@ -11,7 +11,10 @@ class WelcomeScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey.shade200],
+            colors: [
+              Theme.of(context).colorScheme.secondary,
+              Theme.of(context).colorScheme.surface
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -28,18 +31,18 @@ class WelcomeScreen extends StatelessWidget {
                 Text('Ciphera',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.interTight(
-                      textStyle: const TextStyle(
-                        color: Colors.black87,
+                      textStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                       ),
                     )),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Secure messaging was never this easy.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.black45,
+                    color: Theme.of(context).colorScheme.outline,
                     fontSize: 18,
                   ),
                 ),

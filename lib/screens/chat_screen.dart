@@ -217,6 +217,9 @@ class _ChatScreenState extends State<ChatScreen> {
       children: [
         Expanded(
           child: TextField(
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             controller: _messageController,
             decoration: InputDecoration(
                 filled: true,
@@ -257,8 +260,6 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Row(
           children: [
             // Room Name
