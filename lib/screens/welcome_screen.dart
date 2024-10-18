@@ -42,7 +42,7 @@ class WelcomeScreen extends StatelessWidget {
                   'Secure messaging was never this easy.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.outline,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18,
                   ),
                 ),

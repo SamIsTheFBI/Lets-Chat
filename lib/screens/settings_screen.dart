@@ -22,7 +22,11 @@ class SettingsScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Dark Mode"),
+              Text(
+                "Dark Mode",
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
               CupertinoSwitch(
                 activeColor: Theme.of(context).colorScheme.primary,
                 value: Provider.of<ThemeProvider>(context, listen: false)

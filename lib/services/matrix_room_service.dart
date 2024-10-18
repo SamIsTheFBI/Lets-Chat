@@ -34,6 +34,7 @@ class MatrixRoomService {
         'name': responseBody['name'] ?? 'Unnamed Room',
         'avatar': avatarBody?['url'],
         'num_joined_members': responseBody['num_joined_members'].toString(),
+        'creator': responseBody['creator'],
       };
     } else {
       throw Exception('Failed to fetch room details');

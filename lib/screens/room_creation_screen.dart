@@ -61,6 +61,9 @@ class _RoomCreationScreenState extends State<RoomCreationScreen> {
         child: Column(
           children: [
             TextField(
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               controller: _roomNameController,
               decoration: const InputDecoration(labelText: 'Room Name'),
             ),
@@ -70,14 +73,24 @@ class _RoomCreationScreenState extends State<RoomCreationScreen> {
             DropdownButtonFormField<String>(
               value: _visibility,
               decoration: const InputDecoration(labelText: 'Room Visibility'),
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'private',
-                  child: Text('Private'),
+                  child: Text(
+                    'Private',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                 ),
                 DropdownMenuItem(
                   value: 'public',
-                  child: Text('Public'),
+                  child: Text(
+                    'Public',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                 ),
               ],
               onChanged: (String? newValue) {
@@ -93,7 +106,12 @@ class _RoomCreationScreenState extends State<RoomCreationScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Enable End-to-End Encryption'),
+                Text(
+                  'Enable End-to-End Encryption',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
                 CupertinoSwitch(
                   // title: const Text('Enable End-to-End Encryption'),
                   value: _isEncrypted,

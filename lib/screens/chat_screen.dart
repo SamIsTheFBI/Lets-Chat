@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:matrix_client_app/models/message_model.dart';
-import 'package:matrix_client_app/widgets/message_bubble.dart';
+import 'package:matrix_client_app/services/matrix_media_service.dart';
+import 'package:file_picker/file_picker.dart';
 import '../services/matrix_message_service.dart';
 import '../services/matrix_room_service.dart'; // Import room service
 
@@ -23,6 +26,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   late MatrixMessageService messageService;
+  late MatrixMediaService mediaService;
   late MatrixRoomService roomService;
   late Future<List<Map<String, dynamic>>> roomMessages;
   late Future<Map<String, dynamic>> roomDetails;
@@ -32,6 +36,8 @@ class _ChatScreenState extends State<ChatScreen> {
   String memberCount = 'Loading member count...';
   MessageModel? _messageToReply;
   String currentUser = '';
+  String roomCreator = '';
+  bool isRoomOwner = false;
 
   @override
   void initState() {
@@ -39,6 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
     messageService =
         MatrixMessageService(widget.homeserverUrl, widget.accessToken);
     roomService = MatrixRoomService(widget.homeserverUrl, widget.accessToken);
+    mediaService = MatrixMediaService(widget.accessToken, widget.homeserverUrl);
     _loadMessages();
     _getCurrentUser();
     _fetchRoomDetails();
@@ -71,7 +78,9 @@ class _ChatScreenState extends State<ChatScreen> {
         roomName = details['name'];
         roomAvatar = details['avatar'];
         memberCount = details['num_joined_members'];
+        roomCreator = details['creator'];
       });
+      print('hey');
     } catch (error) {
       print('Error loading room details: $error');
     }
@@ -173,7 +182,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Text(
-                isCurrentUser ? '' : message.sender,
+                message.sender,
                 style: const TextStyle(
                   fontSize: 10,
                   color: Colors.grey,
@@ -212,9 +221,55 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Future<void> _pickAndSendMedia() async {
+    // Pick a file
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      File file = File(result.files.single.path!);
+
+      // Upload the media file
+      String? mediaUri = await mediaService.uploadMedia(file);
+      if (mediaUri != null) {
+        // Send media message
+        String mediaType = _getMediaType(file);
+        await mediaService.sendMediaMessage(
+            widget.roomId, mediaUri, mediaType, result.files.single.name);
+      }
+    } else {
+      print('File selection canceled.');
+    }
+  }
+
+  String _getMediaType(File file) {
+    // Determine media type based on file extension
+    final extension = file.path.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return 'm.image';
+      case 'mp4':
+      case 'mov':
+        return 'm.video';
+      default:
+        return 'm.file';
+    }
+  }
+
   Widget _buildUserInput() {
     return Row(
       children: [
+        Container(
+          margin: const EdgeInsets.only(right: 7),
+          child: IconButton(
+            icon: Icon(
+              Icons.attach_file,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            onPressed: _pickAndSendMedia,
+            color: Theme.of(context).colorScheme.inversePrimary,
+          ),
+        ),
         Expanded(
           child: TextField(
             style: TextStyle(
@@ -256,6 +311,65 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  void _showInviteLink(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Invite Link copied to clipboard!')),
+    );
+  }
+
+  void _leaveRoom(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Leave Room'),
+          content: const Text('Are you sure you want to leave this room?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // Close dialog
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Perform leave room logic
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Exit to previous screen
+              },
+              child: const Text('Leave'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteRoom(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Room'),
+          content: const Text(
+              'Are you sure you want to delete this room? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // Close dialog
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Perform delete room logic
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Exit to previous screen
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -277,6 +391,36 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              // Handle the menu actions
+              if (value == 'Invite Link') {
+                _showInviteLink(context);
+              } else if (value == 'Leave Room') {
+                _leaveRoom(context);
+              } else if (value == 'Delete Room') {
+                _deleteRoom(context);
+              }
+            },
+            itemBuilder: (context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'Invite Link',
+                child: Text('Invite Link'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Leave Room',
+                child: Text('Leave Room'),
+              ),
+              if (roomCreator ==
+                  currentUser) // Show "Delete Room" only if the user is the owner
+                const PopupMenuItem<String>(
+                  value: 'Delete Room',
+                  child: Text('Delete Room'),
+                ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         children: [
