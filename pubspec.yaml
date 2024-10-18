@@ -1,4 +1,4 @@
-name: chatting
+name: matrix_client_app
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.2.0 <4.0.0'
+  sdk: ^3.5.3
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -30,51 +30,52 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  matrix: ^0.33.0
+  hive: ^2.2.3
+  path_provider: ^2.1.4
+  sqflite: ^2.3.3+2
+  json_annotation: ^4.7.0
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-#  for integrating firebase
-  firebase_core: ^2.27.0
-# for handling firebase authentication
-  firebase_auth: ^4.17.8
-#for handling google sign in
-  google_sign_in: ^6.2.1
-#for accessing cloud firestore database
-  cloud_firestore: ^4.15.8
-#for storing network images
-  cached_network_image: ^3.3.1
-#for picking images
-  image_picker: ^1.0.8
-  #for accessing Firebase storage (for uploading files)
-  firebase_storage: ^11.6.9
-  #for emojis
-  emoji_picker_flutter: ^2.2.0
-
-
+  cupertino_icons: ^1.0.8
+  flutter_olm: ^2.0.0
+  flutter_openssl_crypto: ^0.5.0
+  gap: ^3.0.1
+  mockito: ^5.4.4
+  dartx: ^1.2.0
+  dartz: ^0.10.1
+  flash: ^3.1.1
+  flutter_secure_storage: ^9.2.2
+  hooks_riverpod: ^2.5.2
+  dio_cookie_manager: ^3.1.1
+  equatable: ^2.0.5
+  page_transition: ^2.1.0
+  logger: ^2.4.0
+  google_fonts: ^6.2.1
+  synchronized: ^3.3.0+3
+  flutter_svg: ^2.0.10+1
+  connectivity_plus: ^6.0.5
+  internet_connection_checker_plus: ^2.5.2
+  modal_bottom_sheet: ^3.0.0
+  cached_network_image: ^3.4.1
+  intersperse: ^2.0.0
+  intl: ^0.19.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.13.1"
-
-flutter_launcher_icons:
-  android: "ic_launcher"
-  ios: true
-  image_path: "images/chat.png"
-  min_sdk_android: 21
-
-  macos:
-    generate: true
-    image_path: "path/to/image.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -87,16 +88,16 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-
-  assets:
-     - images/
-
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware
+  # https://flutter.dev/to/resolution-aware-images
 
   # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
+  # https://flutter.dev/to/asset-from-package
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
@@ -116,4 +117,4 @@ flutter:
   #         weight: 700
   #
   # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+  # see https://flutter.dev/to/font-from-package

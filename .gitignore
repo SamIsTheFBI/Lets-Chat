@@ -24,6 +24,7 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
+*.patch
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -42,8 +43,4 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Ignore Gradle project-specific cache directory
-.gradle
-
-# Ignore Gradle build output directory
-build
+local.properties
