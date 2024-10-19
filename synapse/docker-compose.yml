@@ -1,0 +1,53 @@
+version: '3.3'
+
+services:
+
+
+  ngrok:
+    image: wernight/ngrok
+    container_name: ngrok
+    restart: always
+    environment:
+      - NGROK_AUTHTOKEN=2JlSeBhPEwWtI0aJ7cdz4Td4ciy_BhPcHW7N8cHEoHLi37VQ
+      - NGROK_REGION=in
+    command: ngrok http 127.0.0.1:8008
+
+
+  synapse:
+    image: matrixdotorg/synapse:latest
+    container_name: synapse
+    volumes:
+      - ./data:/data
+    environment:
+      - SYNAPSE_SERVER_NAME=127.0.0.1
+      - SYNAPSE_REPORT_STATS=yes
+    ports:
+      - 8008:8008
+    restart: unless-stopped
+
+
+    
+  
+  postgres:
+    image: postgres:13
+    container_name: synapse-postgres
+    environment:
+      POSTGRES_USER: synapse_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: synapse
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  worker:
+    image: matrixdotorg/synapse:latest
+    container_name: synapse-worker
+    volumes:
+      - ./data:/data
+    environment:
+      - SYNAPSE_SERVER_NAME=127.0.0.1
+    restart: unless-stopped
+
+volumes:
+  postgres:
+  data:
