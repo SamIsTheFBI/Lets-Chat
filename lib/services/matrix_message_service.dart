@@ -9,7 +9,7 @@ class MatrixMessageService {
 
   Future<List<Map<String, dynamic>>> getRoomMessages(String roomId) async {
     final url = Uri.parse(
-        '$homeserverUrl/_matrix/client/r0/rooms/$roomId/messages?dir=b&limit=20');
+        '$homeserverUrl/_matrix/client/r0/rooms/$roomId/messages?dir=b&limit=100');
     final response = await http.get(
       url,
       headers: {

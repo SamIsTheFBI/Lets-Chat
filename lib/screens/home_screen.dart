@@ -174,14 +174,70 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return const Center(child: Text('Error loading rooms'));
+                  return Center(
+                      child: Text(
+                    'Error loading rooms',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
+                  ));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No joined rooms found'));
+                  return Center(
+                      child: Text(
+                    'No joined rooms found',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
+                  ));
                 } else {
                   return ListView.builder(
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       final room = snapshot.data![index];
+                      return GestureDetector(
+                        onTap: () {
+                          // Navigate to the chat screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                roomId: room['id']!,
+                                homeserverUrl: widget.homeserverUrl,
+                                accessToken: widget.accessToken,
+                              ),
+                            ),
+                          ).then((_) {
+                            _refreshRoomList();
+                          });
+                          _refreshRoomList();
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.surfaceContainer,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 8),
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.groups,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              Text(
+                                room['name'] ?? 'Unnamed Room',
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
                       return ListTile(
                         title: Text(room['name'] ?? 'Unnamed Room'),
                         onTap: () {
