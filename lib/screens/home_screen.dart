@@ -152,8 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.search),
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
+            icon: const Icon(Icons.refresh),
+            onPressed: _refreshRoomList,
           ),
         ],
       ),

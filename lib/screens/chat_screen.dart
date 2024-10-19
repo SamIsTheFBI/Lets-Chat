@@ -69,6 +69,12 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         messages = loadedMessages;
       });
+
+      for (final message in messages) {
+        if (message['type'] == 'm.room.encryption') {
+          isRoomEncrypted = true;
+        }
+      }
     }).catchError((error) {
       print('Error loading messages: $error');
     });
@@ -247,14 +253,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   ? Colors.green
                   : isCurrentUser
                       ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.primary,
+                      : Theme.of(context).colorScheme.tertiary,
             ),
             child: Text(
               message.messageBody,
               style: TextStyle(
-                color: isCurrentUser
-                    ? Theme.of(context).colorScheme.inversePrimary
-                    : Theme.of(context).colorScheme.onSurface,
+                color: isRoomEncrypted
+                    ? Colors.white
+                    : isCurrentUser
+                        ? Theme.of(context).colorScheme.inversePrimary
+                        : Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
