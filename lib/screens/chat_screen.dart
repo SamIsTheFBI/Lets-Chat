@@ -41,6 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String roomCreator = '';
   bool isRoomOwner = false;
   String roomId = '';
+  bool isRoomEncrypted = false;
 
   @override
   void initState() {
@@ -90,6 +91,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _sendMessage() async {
     final messageText = _messageController.text.trim();
     if (messageText.isNotEmpty) {
+      print(isRoomEncrypted);
+      if (isRoomEncrypted) {}
       await messageService.sendMessage(widget.roomId, messageText,
           replyTo: _messageToReply?.messageBody);
       _messageController.clear();
@@ -134,6 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       case 'm.room.encryption':
         // Encryption enabled
+        isRoomEncrypted = true;
         return 'End-to-end encryption enabled for this room';
 
       case 'm.room.name':
@@ -239,9 +243,11 @@ class _ChatScreenState extends State<ChatScreen> {
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
                       bottomRight: Radius.circular(30)),
-              color: isCurrentUser
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.secondary,
+              color: isRoomEncrypted
+                  ? Colors.green
+                  : isCurrentUser
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.primary,
             ),
             child: Text(
               message.messageBody,
@@ -297,18 +303,18 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildUserInput() {
     return Row(
       children: [
-        Container(
-          margin: const EdgeInsets.only(right: 7),
-          child: IconButton(
-            icon: Icon(
-              Icons.attach_file,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            onPressed: () {},
-            // onPressed: _pickAndSendMedia,
-            color: Theme.of(context).colorScheme.inversePrimary,
-          ),
-        ),
+        // Container(
+        //   margin: const EdgeInsets.only(right: 7),
+        //   child: IconButton(
+        //     icon: Icon(
+        //       Icons.attach_file,
+        //       color: Theme.of(context).colorScheme.onSurface,
+        //     ),
+        //     onPressed: () {},
+        //     // onPressed: _pickAndSendMedia,
+        //     color: Theme.of(context).colorScheme.inversePrimary,
+        //   ),
+        // ),
         Expanded(
           child: TextField(
             style: TextStyle(

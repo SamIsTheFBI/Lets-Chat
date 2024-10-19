@@ -19,7 +19,7 @@ class MatrixRoomService {
       },
     );
 
-    print("pahuncha");
+    // print("pahuncha");
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -37,6 +37,26 @@ class MatrixRoomService {
       return members;
     } else {
       throw Exception('Failed to load room members');
+    }
+  }
+
+  Future<bool> isRoomEncrypted(String roomId) async {
+    final url =
+        '$homeserverUrl/_matrix/client/v3/rooms/$roomId/state/m.room.encryption?access_token=$accessToken';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true; // The room is encrypted
+    } else if (response.statusCode == 404) {
+      return false; // The room is not encrypted
+    } else {
+      throw Exception('Failed to fetch encryption status');
     }
   }
 

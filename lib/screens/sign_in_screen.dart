@@ -33,9 +33,14 @@ class _SignInScreenState extends State<SignInScreen> {
 
     if (response != null && response.containsKey('access_token')) {
       print('Login successful: ${response['access_token']}');
+      print(response);
       final accessToken = response['access_token'];
+      final userId = response['user_id'];
+      final deviceId = response['device_id'];
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('access_token', accessToken);
+      await prefs.setString('user_id', userId);
+      await prefs.setString('device_id', deviceId);
 
       Navigator.pushReplacement(
         context,

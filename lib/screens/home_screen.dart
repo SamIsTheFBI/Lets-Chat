@@ -195,7 +195,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 accessToken: widget.accessToken,
                               ),
                             ),
-                          );
+                          ).then((_) {
+                            _refreshRoomList();
+                          });
                           _refreshRoomList();
                         },
                       );
