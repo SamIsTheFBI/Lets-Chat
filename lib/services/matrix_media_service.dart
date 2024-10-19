@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 
 class MatrixMediaService {
   final String accessToken;
@@ -8,21 +10,36 @@ class MatrixMediaService {
 
   MatrixMediaService(this.accessToken, this.homeserverUrl);
 
-  // Method to upload media
   Future<String?> uploadMedia(File file) async {
     final uploadUrl =
-        '$homeserverUrl/_matrix/media/v3/upload?access_token=$accessToken';
+        '$homeserverUrl/_matrix/media/v3/upload?filename=justAFile&access_token=$accessToken';
 
-    final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
-    request.files.add(await http.MultipartFile.fromPath('file', file.path));
+    var formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(file.path, filename: 'file'),
+    });
 
-    final response = await request.send();
+    final response = await Dio().post(
+      uploadUrl,
+      data: formData,
+    );
+
+    // final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+    // print('file path: ${file.path}');
+    // request.files.add(http.MultipartFile(
+    //   'file',
+    //   file.readAsBytes().asStream(),
+    //   file.lengthSync(),
+    //   contentType: MediaType('image', 'jpeg'),
+    // ));
+
+    // final response = await request.send();
 
     if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString();
-      final jsonData = jsonDecode(responseBody);
-      final contentUri = jsonData[
-          'content_uri']; // This is the URI you will use to send the media in the message
+      // final responseBody = await response.stream.bytesToString();
+      // final jsonData = jsonDecode(responseBody);
+      final jsonData = response.data;
+      print(jsonData);
+      final contentUri = jsonData['content_uri'];
       return contentUri;
     } else {
       print('Failed to upload media: ${response.statusCode}');
@@ -36,11 +53,22 @@ class MatrixMediaService {
     final sendMessageUrl =
         '$homeserverUrl/_matrix/client/v3/rooms/$roomId/send/m.room.message?access_token=$accessToken';
 
-    final body = jsonEncode({
-      'msgtype': mediaType, // Can be m.image, m.video, m.file, etc.
-      'body': fileName, // File name or a description
-      'url': mediaUri, // Matrix content URI for the uploaded file
-    });
+    Map<String, dynamic> content = {
+      'msgtype': mediaType,
+      'body': fileName,
+      'url': mediaUri,
+    };
+
+    if (mediaType == 'm.image') {
+      content['info'] = {
+        'mimetype': 'image/jpeg',
+        'thumbnail_url': mediaUri,
+        'w': 300,
+        'h': 300,
+      };
+    }
+
+    final body = jsonEncode(content);
 
     final response = await http.post(
       Uri.parse(sendMessageUrl),

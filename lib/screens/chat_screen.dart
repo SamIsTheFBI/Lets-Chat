@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:matrix_client_app/models/message_model.dart';
+import 'package:matrix_client_app/screens/about_room_screen.dart';
 import 'package:matrix_client_app/services/matrix_media_service.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/matrix_message_service.dart';
@@ -38,6 +40,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String currentUser = '';
   String roomCreator = '';
   bool isRoomOwner = false;
+  String roomId = '';
 
   @override
   void initState() {
@@ -77,10 +80,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         roomName = details['name'];
         roomAvatar = details['avatar'];
-        memberCount = details['num_joined_members'];
-        roomCreator = details['creator'];
       });
-      print('hey');
     } catch (error) {
       print('Error loading room details: $error');
     }
@@ -112,7 +112,8 @@ class _ChatScreenState extends State<ChatScreen> {
         if (event['content']['msgtype'] == 'm.text') {
           return event['content']['body'];
         } else {
-          return '[Unsupported message type]';
+          return event.toString();
+          // return '[Unsupported message type]';
         }
 
       case 'm.room.member':
@@ -168,6 +169,41 @@ class _ChatScreenState extends State<ChatScreen> {
         return event.toString();
       // return '[unknown event]';
     }
+  }
+
+  Widget _buildImageMessage(Map<String, dynamic> message, bool isCurrentUser) {
+    // final thumbnailUrl = message['content']['info']['thumbnail_url'];
+    String fileUrl = message['content']['url'];
+    final urlWithoutMxc = fileUrl.substring(6 + 10);
+
+    // final imageUrl =
+    //     '${widget.homeserverUrl}/_matrix/client/v1/media/download/127.0.0.1/YGoWJrHpbPWWpTFZVnrRuwRr?access_token=${widget.accessToken}';
+    final imageUrl =
+        '${widget.homeserverUrl}/_matrix/client/v1/media/download/localhost/$urlWithoutMxc?access_token=${widget.accessToken}';
+
+    // print(imageUrl);
+    return SelectableText(
+      imageUrl,
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+    );
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment:
+            isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            urlWithoutMxc,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          ),
+          const SizedBox(height: 10),
+          Image.network(
+            imageUrl,
+            height: 360,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildMessageItem(MessageModel message, bool isCurrentUser) {
@@ -234,6 +270,8 @@ class _ChatScreenState extends State<ChatScreen> {
         String mediaType = _getMediaType(file);
         await mediaService.sendMediaMessage(
             widget.roomId, mediaUri, mediaType, result.files.single.name);
+        print('sent media message');
+        _loadMessages();
       }
     } else {
       print('File selection canceled.');
@@ -266,7 +304,8 @@ class _ChatScreenState extends State<ChatScreen> {
               Icons.attach_file,
               color: Theme.of(context).colorScheme.onSurface,
             ),
-            onPressed: _pickAndSendMedia,
+            onPressed: () {},
+            // onPressed: _pickAndSendMedia,
             color: Theme.of(context).colorScheme.inversePrimary,
           ),
         ),
@@ -311,7 +350,8 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void _showInviteLink(BuildContext context) {
+  void _showInviteLink(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: roomId));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Invite Link copied to clipboard!')),
     );
@@ -330,8 +370,9 @@ class _ChatScreenState extends State<ChatScreen> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 // Perform leave room logic
+                await roomService.leaveRoom(roomId);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop(); // Exit to previous screen
               },
@@ -401,9 +442,24 @@ class _ChatScreenState extends State<ChatScreen> {
                 _leaveRoom(context);
               } else if (value == 'Delete Room') {
                 _deleteRoom(context);
+              } else if (value == 'About Room') {
+                // page for about room
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => RoomMembersScreen(
+                      roomId: roomId,
+                      accessToken: widget.accessToken,
+                      homeserverUrl: widget.homeserverUrl,
+                    ),
+                  ),
+                );
               }
             },
             itemBuilder: (context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'About Room',
+                child: Text('About Room'),
+              ),
               const PopupMenuItem<String>(
                 value: 'Invite Link',
                 child: Text('Invite Link'),
@@ -446,7 +502,11 @@ class _ChatScreenState extends State<ChatScreen> {
                           message['sender'] ?? 'Unknown Sender';
 
                       bool isCurrentUser = messageSender == currentUser;
+                      roomId = message['room_id'];
 
+                      // if (message['content']['msgtype'] == 'm.image') {
+                      //   return _buildImageMessage(message, isCurrentUser);
+                      // } else
                       if (message['type'] == 'm.room.message') {
                         final MessageModel modelMessage = MessageModel(
                             eventId: message['event_id'],
@@ -455,28 +515,6 @@ class _ChatScreenState extends State<ChatScreen> {
                             timestamp: message['origin_server_ts']);
 
                         return _buildMessageItem(modelMessage, isCurrentUser);
-
-                        // return MessageBubble(
-                        //   message: modelMessage,
-                        //   onReply: _handleReply,
-                        //   isCurrentUser: isCurrentUser,
-                        // );
-
-                        // ListTile(
-                        //   title: Text(
-                        //     messageBody,
-                        //     style: TextStyle(
-                        //       fontSize:
-                        //           message['type'] != 'm.room.message' ? 10 : 18,
-                        //     ),
-                        //   ), // Ensure this won't be null
-                        //   subtitle: Text(
-                        //     messageSender,
-                        //     style: const TextStyle(
-                        //       fontSize: 10,
-                        //     ),
-                        //   ), // Ensure this won't be null
-                        // );
                       } else {
                         return Center(
                           child: Container(

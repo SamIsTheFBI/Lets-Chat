@@ -8,6 +8,38 @@ class MatrixRoomService {
 
   MatrixRoomService(this.homeserverUrl, this.accessToken);
 
+  Future<List<Map<String, dynamic>>> getRoomMembers(String roomId) async {
+    final url =
+        '$homeserverUrl/_matrix/client/v3/rooms/$roomId/members?access_token=$accessToken';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    print("pahuncha");
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      print('joined members $data');
+      List<Map<String, dynamic>> members = [];
+      if (data['chunk'] != null) {
+        for (var member in data['chunk']) {
+          members.add({
+            'user_id': member['state_key'],
+            'display_name':
+                member['content']['displayname'] ?? member['state_key'],
+          });
+        }
+      }
+      return members;
+    } else {
+      throw Exception('Failed to load room members');
+    }
+  }
+
   Future<Map<String, dynamic>> getRoomDetails(String roomId) async {
     final url = Uri.parse(
         '$homeserverUrl/_matrix/client/r0/rooms/$roomId/state/m.room.name');
@@ -32,9 +64,7 @@ class MatrixRoomService {
 
       return {
         'name': responseBody['name'] ?? 'Unnamed Room',
-        'avatar': avatarBody?['url'],
-        'num_joined_members': responseBody['num_joined_members'].toString(),
-        'creator': responseBody['creator'],
+        'avatar': avatarBody?['url']
       };
     } else {
       throw Exception('Failed to fetch room details');
@@ -133,6 +163,24 @@ class MatrixRoomService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to join room: ${response.statusCode}');
+    }
+  }
+
+  Future<void> leaveRoom(String roomId) async {
+    final url =
+        '$homeserverUrl/_matrix/client/v3/rooms/$roomId/leave?access_token=$accessToken';
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Left the room successfully.');
+    } else {
+      print('Failed to leave the room: ${response.statusCode}');
     }
   }
 }
