@@ -1,6 +1,6 @@
 <div align="center">
 
-## 🗨️ Ciphera 
+## 🗨️ Ciphera - Secure Messaging App
 
 | ![ScreenSelect_20241019_173432_Emulator](https://github.com/user-attachments/assets/f59ded29-ecc2-4653-a1c6-141549ff63af) | ![ScreenSelect_20241019_173438_Emulator](https://github.com/user-attachments/assets/2e1394f4-e4d0-4531-9c1b-53519000ebd4) | ![ScreenSelect_20241019_173809_Emulator](https://github.com/user-attachments/assets/50ae41d0-fe52-45c6-9245-3c2c7012d9a9) | ![ScreenSelect_20241019_173540_Emulator](https://github.com/user-attachments/assets/f9fc6f57-6ce8-4a26-9875-fc3cbfec7df7) | ![ScreenSelect_20241019_173824_Emulator](https://github.com/user-attachments/assets/46114db3-3f75-4968-b200-540b5e46bf2a) | ![ScreenSelect_20241019_173829_Emulator](https://github.com/user-attachments/assets/ad6bc1c8-0d5e-4f0a-8735-c3cbbf74cab7) |
 |---|---|---|---|---|---|
