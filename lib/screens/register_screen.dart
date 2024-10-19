@@ -132,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       );
                     },
                     child: Text(
-                      'Register',
+                      'Sign in',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface),
