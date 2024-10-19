@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix_client_app/models/message_model.dart';
 import 'package:matrix_client_app/screens/about_room_screen.dart';
+import 'package:matrix_client_app/screens/sign_in_screen.dart';
+import 'package:matrix_client_app/screens/voice_chat_screen.dart';
 import 'package:matrix_client_app/services/matrix_media_service.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/matrix_message_service.dart';
@@ -455,7 +457,8 @@ class _ChatScreenState extends State<ChatScreen> {
       onTap: ()=>FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: Row(
+          title:Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Ensures space between room name and button
             children: [
               // Room Name
               Flexible(
@@ -463,6 +466,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(roomName),
+                    // Uncomment this if you want to show member count as well
                     // Text(
                     //   memberCount,
                     //   style: TextStyle(
@@ -472,8 +476,20 @@ class _ChatScreenState extends State<ChatScreen> {
                   ],
                 ),
               ),
+
+              // Call button aligned to the right
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignInScreen()),
+                  );
+                },
+                child: Icon(Icons.call, color: Theme.of(context).colorScheme.primary,),
+              ),
             ],
           ),
+
           actions: [
             PopupMenuButton<String>(
               onSelected: (value) {

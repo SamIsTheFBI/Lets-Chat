@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:matrix_client_app/screens/voice_chat_screen.dart';
 import 'sign_in_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -54,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SignInScreen()),
+                            builder: (context) => const VoiceChatScreen()),
                       );
                     },
                     style: ElevatedButton.styleFrom(

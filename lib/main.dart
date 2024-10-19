@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:matrix_client_app/screens/splash_screen.dart';
+import 'package:matrix_client_app/themes/dark_mode.dart';
 import 'package:matrix_client_app/themes/theme_provider.dart';
 import 'screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Ciphera App',
-      theme: Provider.of<ThemeProvider>(context).themeData,
+
+       theme: Provider.of<ThemeProvider>(context).themeData,
       home: const SplashScreen(),
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
