@@ -80,6 +80,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
                 decoration: InputDecoration(
+                  border: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+
                   filled: true,
                   fillColor: Theme.of(context).colorScheme.surfaceContainer,
                   hintText: 'Homeserver URL',
@@ -154,6 +158,18 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 10),
               if (errorMessage.isNotEmpty)
                 Text(errorMessage, style: const TextStyle(color: Colors.red)),
+              SizedBox(height: 104,),
+               Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Powered By " , style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                  Text("[Matrix]", style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface),
+                  )
+                  ,Text(" & Synapse", style: TextStyle( color: Theme.of(context).colorScheme.onSurface),
+                  )
+
+                ],
+              )
             ],
           ),
         ),

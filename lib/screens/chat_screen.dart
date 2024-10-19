@@ -353,6 +353,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             controller: _messageController,
             decoration: InputDecoration(
+              border: InputBorder.none,
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surfaceContainer,
                 hintText: 'Enter your message',
@@ -363,7 +364,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.tertiary,
                   ),
                 ),
                 hintStyle: TextStyle(
@@ -450,137 +451,140 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            // Room Name
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(roomName),
-                  // Text(
-                  //   memberCount,
-                  //   style: TextStyle(
-                  //     color: Theme.of(context).colorScheme.secondary,
-                  //   ),
-                  // ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              // Handle the menu actions
-              if (value == 'Invite Link') {
-                _showInviteLink(context);
-              } else if (value == 'Leave Room') {
-                _leaveRoom(context);
-              } else if (value == 'Delete Room') {
-                _deleteRoom(context);
-              } else if (value == 'About Room') {
-                // page for about room
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => RoomMembersScreen(
-                      roomId: roomId,
-                      accessToken: widget.accessToken,
-                      homeserverUrl: widget.homeserverUrl,
-                    ),
-                  ),
-                );
-              }
-            },
-            itemBuilder: (context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'About Room',
-                child: Text('About Room'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Invite Link',
-                child: Text('Invite Link'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Leave Room',
-                child: Text('Leave Room'),
-              ),
-              if (roomCreator ==
-                  currentUser) // Show "Delete Room" only if the user is the owner
-                const PopupMenuItem<String>(
-                  value: 'Delete Room',
-                  child: Text('Delete Room'),
+    return GestureDetector(
+      onTap: ()=>FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            children: [
+              // Room Name
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(roomName),
+                    // Text(
+                    //   memberCount,
+                    //   style: TextStyle(
+                    //     color: Theme.of(context).colorScheme.secondary,
+                    //   ),
+                    // ),
+                  ],
                 ),
+              ),
             ],
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: roomMessages,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Error loading messages'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No messages found'));
-                } else {
-                  return ListView.builder(
-                    reverse: true,
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-
-                      final messageBody = getEventDisplayText(message);
-                      final messageSender =
-                          message['sender'] ?? 'Unknown Sender';
-
-                      bool isCurrentUser = messageSender == currentUser;
-                      roomId = message['room_id'];
-
-                      // if (message['content']['msgtype'] == 'm.image') {
-                      //   return _buildImageMessage(message, isCurrentUser);
-                      // } else
-                      if (message['type'] == 'm.room.message') {
-                        final MessageModel modelMessage = MessageModel(
-                            eventId: message['event_id'],
-                            messageBody: messageBody,
-                            sender: messageSender,
-                            timestamp: message['origin_server_ts']);
-
-                        return _buildMessageItem(modelMessage, isCurrentUser);
-                      } else {
-                        return Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: Text(
-                              messageBody,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                    },
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                // Handle the menu actions
+                if (value == 'Invite Link') {
+                  _showInviteLink(context);
+                } else if (value == 'Leave Room') {
+                  _leaveRoom(context);
+                } else if (value == 'Delete Room') {
+                  _deleteRoom(context);
+                } else if (value == 'About Room') {
+                  // page for about room
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => RoomMembersScreen(
+                        roomId: roomId,
+                        accessToken: widget.accessToken,
+                        homeserverUrl: widget.homeserverUrl,
+                      ),
+                    ),
                   );
                 }
               },
+              itemBuilder: (context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'About Room',
+                  child: Text('About Room'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Invite Link',
+                  child: Text('Invite Link'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Leave Room',
+                  child: Text('Leave Room'),
+                ),
+                if (roomCreator ==
+                    currentUser) // Show "Delete Room" only if the user is the owner
+                  const PopupMenuItem<String>(
+                    value: 'Delete Room',
+                    child: Text('Delete Room'),
+                  ),
+              ],
             ),
-          ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: roomMessages,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Error loading messages'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('No messages found'));
+                  } else {
+                    return ListView.builder(
+                      reverse: true,
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
 
-          // user input
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _buildUserInput(),
-          ),
-        ],
+                        final messageBody = getEventDisplayText(message);
+                        final messageSender =
+                            message['sender'] ?? 'Unknown Sender';
+
+                        bool isCurrentUser = messageSender == currentUser;
+                        roomId = message['room_id'];
+
+                        // if (message['content']['msgtype'] == 'm.image') {
+                        //   return _buildImageMessage(message, isCurrentUser);
+                        // } else
+                        if (message['type'] == 'm.room.message') {
+                          final MessageModel modelMessage = MessageModel(
+                              eventId: message['event_id'],
+                              messageBody: messageBody,
+                              sender: messageSender,
+                              timestamp: message['origin_server_ts']);
+
+                          return _buildMessageItem(modelMessage, isCurrentUser);
+                        } else {
+                          return Center(
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              child: Text(
+                                messageBody,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
+
+            // user input
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildUserInput(),
+            ),
+          ],
+        ),
       ),
     );
   }
