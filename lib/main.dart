@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:matrix_client_app/screens/splash_screen.dart';
-import 'package:matrix_client_app/themes/light_mode.dart';
 import 'package:matrix_client_app/themes/theme_provider.dart';
 import 'screens/welcome_screen.dart';
 import 'package:provider/provider.dart';

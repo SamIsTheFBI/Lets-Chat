@@ -7,7 +7,10 @@ import 'package:matrix_client_app/screens/about_room_screen.dart';
 import 'package:matrix_client_app/services/matrix_media_service.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/matrix_message_service.dart';
-import '../services/matrix_room_service.dart'; // Import room service
+import '../services/matrix_room_service.dart';
+import 'dart:async';
+
+Timer? timer;
 
 class ChatScreen extends StatefulWidget {
   final String roomId;
@@ -53,6 +56,26 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadMessages();
     _getCurrentUser();
     _fetchRoomDetails();
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => checkMess);
+  }
+
+  void checkMess() {
+    final tempRoomMessages = messageService.getRoomMessages(widget.roomId);
+    int len = 0;
+    tempRoomMessages.then((loadedMess) {
+      len = loadedMess.length;
+    });
+
+    print(len);
+    if (len != messages.length) {
+      _loadMessages();
+    }
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   void _getCurrentUser() async {
@@ -432,17 +455,19 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Row(
           children: [
             // Room Name
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(roomName),
-                // Text(
-                //   memberCount,
-                //   style: TextStyle(
-                //     color: Theme.of(context).colorScheme.secondary,
-                //   ),
-                // ),
-              ],
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(roomName),
+                  // Text(
+                  //   memberCount,
+                  //   style: TextStyle(
+                  //     color: Theme.of(context).colorScheme.secondary,
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
           ],
         ),
