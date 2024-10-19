@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:matrix_client_app/screens/register_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'home_screen.dart';
-import '../services/matrix_auth_service.dart';
+import 'package:matrix_client_app/screens/sign_in_screen.dart';
+import 'package:http/http.dart' as http;
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  _SignInScreenState createState() => _SignInScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
-  final _homeserverController = TextEditingController();
+class _RegisterScreenState extends State<RegisterScreen> {
+  final homeserver = 'http://localhost:8008';
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   String errorMessage = '';
 
-  Future<void> _signIn() async {
-    final homeserverUrl = _homeserverController.text;
+  Future<void> _registerAcc() async {
+    final homeserverUrl = homeserver;
     final username = _usernameController.text;
     final password = _passwordController.text;
 
@@ -29,40 +27,25 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    MatrixAuthService authService = MatrixAuthService(homeserverUrl);
-    final response = await authService.login(username, password);
+    final url = Uri.parse(
+        'http://127.0.0.1:5000/register-user-cli?username=$username&password=$password');
+    await http.get(
+      url,
+    );
 
-    if (response != null && response.containsKey('access_token')) {
-      print('Login successful: ${response['access_token']}');
-      print(response);
-      final accessToken = response['access_token'];
-      final userId = response['user_id'];
-      final deviceId = response['device_id'];
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('access_token', accessToken);
-      await prefs.setString('user_id', userId);
-      await prefs.setString('device_id', deviceId);
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(
-            homeserverUrl: homeserverUrl,
-            accessToken: accessToken,
-          ),
-        ),
-      );
-    } else {
-      setState(() {
-        errorMessage = "Login failed. Please check your credentials.";
-      });
-    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SignInScreen(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Center(child: Text('Ciphera - Sign In'))),
+      appBar: AppBar(
+          title: const Center(child: Text('Ciphera - Register Account'))),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: SingleChildScrollView(
@@ -75,31 +58,6 @@ class _SignInScreenState extends State<SignInScreen> {
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 50),
-              TextField(
-                controller: _homeserverController,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceContainer,
-                  hintText: 'Homeserver URL',
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
               TextField(
                 controller: _usernameController,
                 style: TextStyle(
@@ -146,21 +104,21 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _signIn,
+                onPressed: _registerAcc,
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     )),
-                child: const Text('Sign In'),
+                child: const Text('Register'),
               ),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Not a member? ',
+                    'Already have an account? ',
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface),
                   ),
@@ -169,12 +127,12 @@ class _SignInScreenState extends State<SignInScreen> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const RegisterScreen(),
+                          builder: (context) => const SignInScreen(),
                         ),
                       );
                     },
                     child: Text(
-                      'Register now',
+                      'Register',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface),
