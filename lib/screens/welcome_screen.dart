@@ -55,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const VoiceChatScreen()),
+                            builder: (context) => const SignInScreen()),
                       );
                     },
                     style: ElevatedButton.styleFrom(

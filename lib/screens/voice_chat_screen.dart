@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class VoiceChatScreen extends StatefulWidget {
   const VoiceChatScreen({super.key});
 
@@ -7,50 +8,45 @@ class VoiceChatScreen extends StatefulWidget {
 }
 
 class _VoiceChatScreenState extends State<VoiceChatScreen> {
-  bool isVoiceChatActive = false; // Tracks whether the voice chat screen is active
+  bool isVoiceChatActive =
+      false; // Tracks whether the voice chat screen is active
   bool isMuted = false;
   final _textController = TextEditingController();
-  bool _showEmoji =false;// Tracks whether the mic is muted
+  bool _showEmoji = false; // Tracks whether the mic is muted
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: GestureDetector(
-        onTap:() =>FocusScope.of(context).unfocus(),
-    child: WillPopScope(
-    //If emojis are shown & back button is pressed then hide emoji
-    //or else simply close current screen on back button click
-    onWillPop: (){
-    if(_showEmoji)
-    {
-    setState(() {
-    _showEmoji=!_showEmoji;
-
-    });
-    return Future.value(false); //The current screen is not removed
-    }
-    else
-    {
-    return Future.value(true); //Current screen is removed
-    }
-
-    },
-        child: Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          appBar: AppBar(
-            title: Text(
-              'Voice Chat',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+        debugShowCheckedModeBanner: false,
+        home: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: WillPopScope(
+            //If emojis are shown & back button is pressed then hide emoji
+            //or else simply close current screen on back button click
+            onWillPop: () {
+              if (_showEmoji) {
+                setState(() {
+                  _showEmoji = !_showEmoji;
+                });
+                return Future.value(false); //The current screen is not removed
+              } else {
+                return Future.value(true); //Current screen is removed
+              }
+            },
+            child: Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              appBar: AppBar(
+                title: Text(
+                  'Voice Chat',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
               ),
+              body: voiceChatScreen(),
             ),
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
           ),
-          body:voiceChatScreen(),
-
-        ),
-      ),
-    ));
+        ));
   }
 
   // Voice Chat Screen widget
@@ -66,10 +62,17 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
                 size: 100,
                 color: Colors.blueAccent,
               ),
-              SizedBox(height: 20),
-              Text(
-                isMuted ? 'You are muted. Nobody can hear you.' : "You are in a voice chat. The Spotlight is yours.",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+              const SizedBox(height: 20),
+              Center(
+                child: Text(
+                  isMuted
+                      ? 'You are muted. Nobody can hear you.'
+                      : "You are in a voice chat. The Spotlight is yours.",
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface),
+                ),
               ),
             ],
           ),
@@ -78,7 +81,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
           alignment: Alignment.bottomCenter,
           child: Container(
             color: Theme.of(context).colorScheme.surfaceContainer,
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -97,7 +100,8 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
                 ),
                 // Server Chat screen button (pop once)
                 IconButton(
-                  icon: Icon(Icons.chat, color: Colors.blueAccent, size: 30),
+                  icon: const Icon(Icons.chat,
+                      color: Colors.blueAccent, size: 30),
                   onPressed: () {
                     // Pop the screen once, if applicable (in real app)
                     Navigator.pop(context);
@@ -105,34 +109,37 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
                 ),
                 // Emoji Reaction button
                 IconButton(
-                  icon: Icon(Icons.emoji_emotions, color: Colors.amber, size: 30),
-                  onPressed: () {
-                    showModalBottomSheet(context: context,
-                        builder: (BuildContext context){
-                      return SizedBox(
-                        height: 100,
-                          width: 400,
-                          child: Center(
-                            child: Row(
+                    icon: const Icon(Icons.emoji_emotions,
+                        color: Colors.amber, size: 30),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SizedBox(
+                            height: 100,
+                            width: 400,
+                            child: Center(
+                                child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                ElevatedButton(onPressed: (){}, child: Text("😀")),
-                                ElevatedButton(onPressed: (){}, child: Text("😂")),
-                                ElevatedButton(onPressed: (){}, child: Text("😎")),
-                                ElevatedButton(onPressed: (){}, child: Text("😥")),
+                                ElevatedButton(
+                                    onPressed: () {}, child: const Text("😀")),
+                                ElevatedButton(
+                                    onPressed: () {}, child: const Text("😂")),
+                                ElevatedButton(
+                                    onPressed: () {}, child: const Text("😎")),
+                                ElevatedButton(
+                                    onPressed: () {}, child: const Text("😥")),
                               ],
-                            )
-                          ),
+                            )),
+                          );
+                        },
                       );
-
-                    },
-                    );
-                  }
-                ),
+                    }),
 
                 // Disconnect button (pop twice)
                 IconButton(
-                  icon: Icon(Icons.call_end, color: Colors.red, size: 30),
+                  icon: const Icon(Icons.call_end, color: Colors.red, size: 30),
                   onPressed: () {
                     // Pop the screen twice (go back two screens, if applicable)
                     Navigator.pop(context); // First pop

@@ -355,7 +355,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             controller: _messageController,
             decoration: InputDecoration(
-              border: InputBorder.none,
+                border: InputBorder.none,
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surfaceContainer,
                 hintText: 'Enter your message',
@@ -454,11 +454,12 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: ()=>FocusScope.of(context).unfocus(),
+      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title:Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Ensures space between room name and button
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment
+                .spaceBetween, // Ensures space between room name and button
             children: [
               // Room Name
               Flexible(
@@ -466,30 +467,26 @@ class _ChatScreenState extends State<ChatScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(roomName),
-                    // Uncomment this if you want to show member count as well
-                    // Text(
-                    //   memberCount,
-                    //   style: TextStyle(
-                    //     color: Theme.of(context).colorScheme.secondary,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
 
               // Call button aligned to the right
-              ElevatedButton(
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SignInScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const VoiceChatScreen()),
                   );
                 },
-                child: Icon(Icons.call, color: Theme.of(context).colorScheme.primary,),
+                child: Icon(
+                  Icons.call,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ],
           ),
-
           actions: [
             PopupMenuButton<String>(
               onSelected: (value) {
